@@ -27,6 +27,7 @@ describe.only("GET /api/categories", () => {
         });
       });
   });
+
 });
 describe.only("GET /api", () => {
   test("should return a JSON", () => {
@@ -72,3 +73,6 @@ describe.only("GET /api", () => {
       });
   });
 });
+
+});
+
