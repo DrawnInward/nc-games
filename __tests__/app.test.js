@@ -4,15 +4,11 @@ const data = require("../db/data/test-data");
 const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 
-beforeEach(() => {
-  return seed(data);
-});
+beforeEach(() => seed(data));
 
-afterAll(() => {
-  db.end();
-});
+afterAll(() => db.end());
 
-describe.only("GET /api/categories", () => {
+describe("GET /api/categories", () => {
   test("GET 200 status from endpoint", () => {
     return request(app).get("/api/categories").expect(200);
   });
@@ -27,9 +23,8 @@ describe.only("GET /api/categories", () => {
         });
       });
   });
-
 });
-describe.only("GET /api", () => {
+describe("GET /api", () => {
   test("should return a JSON", () => {
     return request(app)
       .get("/api")
@@ -73,6 +68,3 @@ describe.only("GET /api", () => {
       });
   });
 });
-
-});
-
