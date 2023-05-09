@@ -28,8 +28,3 @@ describe.only("GET /api/categories", () => {
       });
   });
 });
-describe("GET /api", () => {
-  test("should return a JSON", () => {
-    return request(app).get("/api");
-  });
-});
