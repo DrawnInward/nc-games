@@ -109,12 +109,54 @@ describe("GET /api/reviews", () => {
         });
       });
   });
-  test("GET 200 -- result object shouldn't have a review_body property", () => {
+  test("GET 200 -- result object should be sorted in descending order by date", () => {
     return request(app)
       .get("/api/reviews")
       .expect(200)
       .then((response) => {
         expect(response.body.reviews).toBeSorted({ descending: true });
+      });
+  });
+});
+
+describe("/api/reviews/:review_id/comments", () => {
+  test("should return the review with the correct properties", () => {
+    return request(app)
+      .get("/api/reviews/2/comments")
+      .expect(200)
+      .then((response) => {
+        response.body.comments.forEach((comment) => {
+          expect(comment).toHaveProperty("comment_id");
+          expect(comment).toHaveProperty("votes");
+          expect(comment).toHaveProperty("created_at");
+          expect(comment).toHaveProperty("author");
+          expect(comment).toHaveProperty("body");
+          expect(comment).toHaveProperty("review_id");
+        });
+      });
+  });
+  test("will return 404 when given a valid id that does not exist", () => {
+    return request(app)
+      .get("/api/reviews/2000/comments")
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe("review not found");
+      });
+  });
+  test("will give 400 when given an invalid ID ", () => {
+    return request(app)
+      .get("/api/reviews/SELECT * FROM cards/comments")
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("bad request!");
+      });
+  });
+  test("GET 200 -- results should be sorted in descending order by date", () => {
+    return request(app)
+      .get("/api/reviews/2/comments")
+      .expect(200)
+      .then((response) => {
+        expect(response.body.comments).toBeSorted({ descending: true });
       });
   });
 });

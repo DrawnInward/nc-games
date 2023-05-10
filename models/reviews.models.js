@@ -18,3 +18,17 @@ exports.selectReviews = () => {
       });
     });
 };
+
+exports.selectComments = (id) => {
+  const reviewQuery = `
+    SELECT * FROM comments
+    WHERE review_id = $1
+    ORDER BY created_at DESC`;
+
+  return db.query(reviewQuery, [id]).then((result) => {
+    if (result.rows.length === 0) {
+      return Promise.reject({ status: 404, msg: "review not found" });
+    }
+    return result.rows;
+  });
+};
