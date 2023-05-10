@@ -4,13 +4,9 @@ const data = require("../db/data/test-data");
 const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 
-beforeEach(() => {
-  return seed(data);
-});
+beforeEach(() => seed(data));
 
-afterAll(() => {
-  db.end();
-});
+afterAll(() => db.end());
 
 describe("GET /api/categories", () => {
   test("GET 200 status from endpoint", () => {
@@ -107,3 +103,4 @@ describe("/api/reviews/:review_id", () => {
       });
   });
 });
+
