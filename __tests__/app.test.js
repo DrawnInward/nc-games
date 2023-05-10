@@ -104,3 +104,53 @@ describe("/api/reviews/:review_id", () => {
   });
 });
 
+=======
+describe("GET /api/reviews", () => {
+  test("GET 200 status from endpoint", () => {
+    return request(app).get("/api/reviews").expect(200);
+  });
+  test("GET 200 returns correct keys", () => {
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then((response) => {
+        response.body.reviews.forEach((review) => {
+          expect(review).toHaveProperty("owner");
+          expect(review).toHaveProperty("review_id");
+          expect(review).toHaveProperty("category");
+          expect(review).toHaveProperty("review_img_url");
+          expect(review).toHaveProperty("created_at");
+          expect(review).toHaveProperty("votes");
+          expect(review).toHaveProperty("designer");
+          expect(review).toHaveProperty("comment_count");
+        });
+      });
+  });
+  test("GET 200 -- comment count should return the correct number of comment id's associated with each review id", () => {
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then((response) => {
+        expect(response.body.reviews[5].comment_count).toBe("3");
+        expect(response.body.reviews[5].review_id).toBe(2);
+      });
+  });
+  test("GET 200 -- result object shouldn't have a review_body property", () => {
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then((response) => {
+        response.body.reviews.forEach((review) => {
+          expect(review).not.toHaveProperty("review_body");
+        });
+      });
+  });
+  test("GET 200 -- result object shouldn't have a review_body property", () => {
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then((response) => {
+        expect(response.body.reviews).toBeSorted({ descending: true });
+      });
+  });
+});
