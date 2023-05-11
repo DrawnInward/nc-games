@@ -143,6 +143,14 @@ describe("/api/reviews/:review_id/comments", () => {
         expect(response.body.msg).toBe("review not found");
       });
   });
+  test("will return 200 when given an id that does exist but has no comments associated with it", () => {
+    return request(app)
+      .get("/api/reviews/4/comments")
+      .expect(200)
+      .then((response) => {
+        expect(response.body.comments).toEqual([]);
+      });
+  });
   test("will give 400 when given an invalid ID ", () => {
     return request(app)
       .get("/api/reviews/SELECT * FROM cards/comments")

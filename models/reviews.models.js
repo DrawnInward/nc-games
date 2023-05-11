@@ -1,4 +1,5 @@
 const db = require("../db/connection");
+const { checkReviewIdExists } = require("../db/seeds/utils");
 
 exports.selectReviews = () => {
   const query = `SELECT reviews.owner, reviews.title, reviews.review_id, reviews.category, reviews.review_img_url, reviews.created_at, reviews.votes, reviews.designer, COUNT(comments.comment_id) comment_count
@@ -25,10 +26,9 @@ exports.selectComments = (id) => {
     WHERE review_id = $1
     ORDER BY created_at DESC`;
 
-  return db.query(reviewQuery, [id]).then((result) => {
-    if (result.rows.length === 0) {
-      return Promise.reject({ status: 404, msg: "review not found" });
-    }
-    return result.rows;
+  return checkReviewIdExists(id).then(() => {
+    return db.query(reviewQuery, [id]).then((result) => {
+      return result.rows;
+    });
   });
 };
