@@ -30,6 +30,7 @@ exports.checkReviewIdExists = (id) => {
 		  SELECT * from reviews
 		  WHERE review_id = $1;
 		  `,
+
       [id]
     )
     .then((result) => {

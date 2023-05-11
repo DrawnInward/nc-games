@@ -108,11 +108,12 @@ describe("GET /api/reviews", () => {
   test("GET 200 status from endpoint", () => {
     return request(app).get("/api/reviews").expect(200);
   });
-  test("GET 200 returns correct keys", () => {
+  test("GET 200 returns only correct keys", () => {
     return request(app)
       .get("/api/reviews")
       .expect(200)
       .then((response) => {
+        expect(response.body.reviews.length).toBe(13);
         response.body.reviews.forEach((review) => {
           expect(review).toHaveProperty("owner");
           expect(review).toHaveProperty("review_id");
@@ -144,7 +145,7 @@ describe("GET /api/reviews", () => {
         });
       });
   });
-  test("GET 200 -- result object shouldn't have a review_body property", () => {
+  test("GET 200 -- result object should be sorted in descending order by date", () => {
     return request(app)
       .get("/api/reviews")
       .expect(200)
@@ -153,6 +154,7 @@ describe("GET /api/reviews", () => {
       });
   });
 });
+
 describe("PATCH /api/reviews/:review_id", () => {
   test("PATCH - status: 200 - updates votes correctly if votes increment is positive, on the correct object", () => {
     return request(app)
@@ -180,11 +182,89 @@ describe("PATCH /api/reviews/:review_id", () => {
         expect(Object.keys(review).length).toBe(9);
         expect(review.owner).toBe("bainesface");
         expect(review.votes).toBe(-95);
+        });
+  });
+      
+       test("will give 400 when given an invalid ID", () => {
+     return request(app)
+  .patch("/api/reviews/SELECT * FROM cards") --handle this erro
+  .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("bad request!");
+      });
+  });
+  
+  
+  test("will give 400 when request object is not formatted correctly", () => {
+    return request(app)
+  .patch("/api/reviews/3") --and this
+      .expect(400)
+      .send({
+        username: "mallionaire",
+        body: "Ah what a wonderful game! So simple I could play it with both of my hands full, as they were all night, with wine.",
+        votes: 10000000000,
+      })
+      .then((response) => {
+      expect(response.body.msg).toBe("bad request!");
+        });
+  });
+  
+  test("will return 404 when given a valid id that does not exist", () => {
+    return request(app)
+      .patch("/api/reviews/3000")
+      .expect(404)
+      .send({
+        inc_votes: -100,
+        })
+      .then((response) => {
+        const { comment } = response.body;
+        expect(response.body.msg).toBe("review id not found");
+      });
+  });
+});
+      
+      
+
+describe("POST /api/reviews/:review_id/comments", () => {
+  test("POST - status: 201 - adds a new comment and responds with the newly created comment object with the correct properties", () => {
+    return request(app)
+      .post("/api/reviews/3/comments")
+      .expect(201)
+      .send({
+        username: "mallionaire",
+        body: "Ah what a wonderful game! So simple I could play it with both of my hands full, as they were all night, with wine.",
+      })
+      .then((response) => {
+        const { comment } = response.body;
+        expect(comment).toHaveProperty("body");
+        expect(comment).toHaveProperty("author");
+        expect(comment).toHaveProperty("review_id");
+        expect(comment).toHaveProperty("votes");
+        expect(comment).toHaveProperty("created_at");
+      });
+  });
+  test("POST - status: 201 - sucessfully adds the correct values to the table", () => {
+    return request(app)
+      .post("/api/reviews/3/comments")
+      .expect(201)
+      .send({
+        username: "mallionaire",
+        body: "Ah what a wonderful game! So simple I could play it with both of my hands full, as they were all night, with wine.",
+      })
+      .then((response) => {
+        const { comment } = response.body;
+        expect(comment.body).toBe(
+          "Ah what a wonderful game! So simple I could play it with both of my hands full, as they were all night, with wine."
+        );
+        expect(comment.author).toBe("mallionaire");
+        expect(comment).toHaveProperty("review_id");
+        expect(comment.votes).toBe(0);
+        expect(comment).toHaveProperty("created_at");
       });
   });
   test("will give 400 when given an invalid ID", () => {
     return request(app)
-      .patch("/api/reviews/SELECT * FROM cards")
+      .post("/api/reviews/SELECT * FROM cards/comments")
       .expect(400)
       .then((response) => {
         expect(response.body.msg).toBe("bad request!");
@@ -192,7 +272,7 @@ describe("PATCH /api/reviews/:review_id", () => {
   });
   test("will give 400 when request object is not formatted correctly", () => {
     return request(app)
-      .patch("/api/reviews/3")
+      .post("/api/reviews/3/comments")
       .expect(400)
       .send({
         username: "mallionaire",
@@ -205,14 +285,64 @@ describe("PATCH /api/reviews/:review_id", () => {
   });
   test("will return 404 when given a valid id that does not exist", () => {
     return request(app)
-      .patch("/api/reviews/3000")
+      .post("/api/reviews/3000/comments")
       .expect(404)
       .send({
-        inc_votes: -100,
+        username: "mallionaire",
+        body: "Ah what a wonderful game! So simple I could play it with both of my hands full, as they were all night, with wine.",
       })
       .then((response) => {
         const { comment } = response.body;
         expect(response.body.msg).toBe("review id not found");
+      });
+  });
+});
+describe("/api/reviews/:review_id/comments", () => {
+  test("should return the review with the correct properties", () => {
+    return request(app)
+      .get("/api/reviews/2/comments")
+      .expect(200)
+      .then((response) => {
+        response.body.comments.forEach((comment) => {
+          expect(comment).toHaveProperty("comment_id");
+          expect(comment).toHaveProperty("votes");
+          expect(comment).toHaveProperty("created_at");
+          expect(comment).toHaveProperty("author");
+          expect(comment).toHaveProperty("body");
+          expect(comment).toHaveProperty("review_id");
+        });
+      });
+  });
+  test("will return 404 when given a valid id that does not exist", () => {
+    return request(app)
+      .get("/api/reviews/2000/comments")
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe("review id not found");
+      });
+  });
+  test("will return 200 when given an id that does exist but has no comments associated with it", () => {
+    return request(app)
+      .get("/api/reviews/4/comments")
+      .expect(200)
+      .then((response) => {
+        expect(response.body.comments).toEqual([]);
+      });
+  });
+  test("will give 400 when given an invalid ID ", () => {
+    return request(app)
+      .get("/api/reviews/SELECT * FROM cards/comments")
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("bad request!");
+      });
+  });
+  test("GET 200 -- results should be sorted in descending order by date", () => {
+    return request(app)
+      .get("/api/reviews/2/comments")
+      .expect(200)
+      .then((response) => {
+        expect(response.body.comments).toBeSorted({ descending: true });
       });
   });
 });
