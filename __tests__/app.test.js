@@ -153,7 +153,6 @@ describe("GET /api/reviews", () => {
         expect(response.body.reviews).toBeSorted({ descending: true });
       });
   });
-
 });
 
 describe("PATCH /api/reviews/:review_id", () => {
@@ -221,7 +220,6 @@ describe("PATCH /api/reviews/:review_id", () => {
         expect(response.body.msg).toBe("review id not found");
       });
   });
-
 });
 
 describe("POST /api/reviews/:review_id/comments", () => {
@@ -345,7 +343,6 @@ describe("/api/reviews/:review_id/comments", () => {
   });
 });
 
-
 describe("DELETE /api/comments/:comment_id", () => {
   test("DELETE - status 204 - will return 204 and no content", () => {
     return request(app).delete("/api/comments/3").expect(204);
@@ -366,3 +363,22 @@ describe("DELETE /api/comments/:comment_id", () => {
   });
 });
 
+describe("GET /api/users", () => {
+  test("GET 200 status from endpoint", () => {
+    return request(app).get("/api/users").expect(200);
+  });
+  test("GET 200 returns correct keys", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then((response) => {
+        expect(response.body.users.length).toBe(4);
+        expect(Object.keys(response.body.users[0]).length).toBe(3);
+        response.body.users.forEach((user) => {
+          expect(user).toHaveProperty("username");
+          expect(user).toHaveProperty("name");
+          expect(user).toHaveProperty("avatar_url");
+        });
+      });
+  });
+});
