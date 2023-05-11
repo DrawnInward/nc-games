@@ -214,7 +214,7 @@ describe("POST /api/reviews/:review_id/comments", () => {
         expect(response.body.msg).toBe("bad request!");
       });
   });
-  test.only("will return 404 when given a valid id that does not exist", () => {
+  test("will return 404 when given a valid id that does not exist", () => {
     return request(app)
       .post("/api/reviews/3000/comments")
       .expect(404)
