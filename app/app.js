@@ -5,11 +5,15 @@ const {
   getReviews,
   getComments,
 } = require("../controllers/reviews.controllers");
+const { getReview } = require("../controllers/review.controllers");
+
 
 const app = express();
+app.use(express.json());
 
 app.get("/api/categories", getCategories);
 app.get("/api", getEndpoints);
+app.get("/api/reviews/:review_id", getReview);
 app.get("/api/reviews", getReviews);
 app.get("/api/reviews/:review_id/comments", getComments);
 

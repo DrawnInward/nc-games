@@ -69,6 +69,41 @@ describe("GET /api", () => {
   });
 });
 
+describe("/api/reviews/:review_id", () => {
+  test("should return the review with the correct properties", () => {
+    return request(app)
+      .get("/api/reviews/2")
+      .expect(200)
+      .then((response) => {
+        expect(response.body.review).toHaveProperty("review_id");
+        expect(response.body.review).toHaveProperty("title");
+        expect(response.body.review).toHaveProperty("review_body");
+        expect(response.body.review).toHaveProperty("designer");
+        expect(response.body.review).toHaveProperty("review_img_url");
+        expect(response.body.review).toHaveProperty("votes");
+        expect(response.body.review).toHaveProperty("category");
+        expect(response.body.review).toHaveProperty("owner");
+        expect(response.body.review).toHaveProperty("created_at");
+      });
+  });
+  test("will return 404 when given a valid id that does not exist", () => {
+    return request(app)
+      .get("/api/reviews/2000")
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe("review not found");
+      });
+  });
+  test("will give 400 when given an invalid ID ", () => {
+    return request(app)
+      .get("/api/reviews/SELECT * FROM cards")
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("bad request!");
+      });
+  });
+});
+
 describe("GET /api/reviews", () => {
   test("GET 200 status from endpoint", () => {
     return request(app).get("/api/reviews").expect(200);
@@ -117,6 +152,7 @@ describe("GET /api/reviews", () => {
         expect(response.body.reviews).toBeSorted({ descending: true });
       });
   });
+
 });
 
 describe("/api/reviews/:review_id/comments", () => {
@@ -168,3 +204,5 @@ describe("/api/reviews/:review_id/comments", () => {
       });
   });
 });
+
+
