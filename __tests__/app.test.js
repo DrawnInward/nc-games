@@ -294,12 +294,11 @@ describe("POST /api/reviews/:review_id/comments", () => {
   });
 });
 describe("/api/reviews/:review_id/comments", () => {
-  test.only("should return the review with the correct properties", () => {
+  test("should return the review with the correct properties", () => {
     return request(app)
       .get("/api/reviews/2/comments")
       .expect(200)
       .then((response) => {
-        console.log(response.body);
         response.body.comments.forEach((comment) => {
           expect(comment).toHaveProperty("comment_id");
           expect(comment).toHaveProperty("votes");
