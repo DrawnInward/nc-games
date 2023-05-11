@@ -104,16 +104,16 @@ describe("/api/reviews/:review_id", () => {
   });
 });
 
-=======
 describe("GET /api/reviews", () => {
   test("GET 200 status from endpoint", () => {
     return request(app).get("/api/reviews").expect(200);
   });
-  test("GET 200 returns correct keys", () => {
+  test("GET 200 returns only correct keys", () => {
     return request(app)
       .get("/api/reviews")
       .expect(200)
       .then((response) => {
+        expect(response.body.reviews.length).toBe(13);
         response.body.reviews.forEach((review) => {
           expect(review).toHaveProperty("owner");
           expect(review).toHaveProperty("review_id");
@@ -151,6 +151,53 @@ describe("GET /api/reviews", () => {
       .expect(200)
       .then((response) => {
         expect(response.body.reviews).toBeSorted({ descending: true });
+      });
+  });
+});
+
+describe("POST /api/reviews/:review_id/comments", () => {
+  test("POST - status: 201 - adds a new comment and responds with the newly created comment object with the correct properties", () => {
+    return request(app)
+      .post("/api/reviews/3/comments")
+      .expect(201)
+      .send({
+        username: "mallionaire",
+        body: "Ah what a wonderful game! So simple I could play it with both of my hands full, as they were all night, with wine.",
+      })
+      .then((response) => {
+        const { comment } = response.body;
+        expect(comment).toHaveProperty("body");
+        expect(comment).toHaveProperty("author");
+        expect(comment).toHaveProperty("review_id");
+        expect(comment).toHaveProperty("votes");
+        expect(comment).toHaveProperty("created_at");
+      });
+  });
+  test("POST - status: 201 - sucessfully adds the correct values to the table", () => {
+    return request(app)
+      .post("/api/reviews/3/comments")
+      .expect(201)
+      .send({
+        username: "mallionaire",
+        body: "Ah what a wonderful game! So simple I could play it with both of my hands full, as they were all night, with wine.",
+      })
+      .then((response) => {
+        const { comment } = response.body;
+        expect(comment.body).toBe(
+          "Ah what a wonderful game! So simple I could play it with both of my hands full, as they were all night, with wine."
+        );
+        expect(comment.author).toBe("mallionaire");
+        expect(comment).toHaveProperty("review_id");
+        expect(comment.votes).toBe(0);
+        expect(comment).toHaveProperty("created_at");
+      });
+  });
+  test("will give 400 when given an invalid ID", () => {
+    return request(app)
+      .post("/api/reviews/SELECT * FROM cards/comments")
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("bad request!");
       });
   });
 });

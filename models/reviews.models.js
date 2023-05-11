@@ -18,3 +18,21 @@ exports.selectReviews = () => {
       });
     });
 };
+
+exports.createComments = (newComment, review_id) => {
+  const { username, body } = newComment;
+
+  const newCommentQuery = `
+INSERT INTO comments
+(body, author, review_id)
+VALUES
+($1, $2, $3)
+returning*;
+`;
+
+  return db
+    .query(newCommentQuery, [body, username, review_id])
+    .then((response) => {
+      return response.rows[0];
+    });
+};
