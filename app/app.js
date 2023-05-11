@@ -8,6 +8,8 @@ const {
   getComments,
   incrementVotes,
 } = require("../controllers/reviews.controllers");
+const { deleteComment } = require("../controllers/comments.controllers");
+
 
 const app = express();
 app.use(express.json());
@@ -19,6 +21,7 @@ app.get("/api/reviews", getReviews);
 app.patch("/api/reviews/:review_id", incrementVotes);
 app.post("/api/reviews/:review_id/comments", postComments);
 app.get("/api/reviews/:review_id/comments", getComments);
+app.delete("/api/comments/:comment_id", deleteComment);
 
 app.use((err, req, res, next) => {
   if (err.code === "22P02") {

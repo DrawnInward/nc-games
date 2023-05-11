@@ -153,6 +153,7 @@ describe("GET /api/reviews", () => {
         expect(response.body.reviews).toBeSorted({ descending: true });
       });
   });
+
 });
 
 describe("PATCH /api/reviews/:review_id", () => {
@@ -220,6 +221,7 @@ describe("PATCH /api/reviews/:review_id", () => {
         expect(response.body.msg).toBe("review id not found");
       });
   });
+
 });
 
 describe("POST /api/reviews/:review_id/comments", () => {
@@ -342,3 +344,25 @@ describe("/api/reviews/:review_id/comments", () => {
       });
   });
 });
+
+
+describe("DELETE /api/comments/:comment_id", () => {
+  test("DELETE - status 204 - will return 204 and no content", () => {
+    return request(app).delete("/api/comments/3").expect(204);
+  });
+  test("DELETE - status 400 - will give 400 when given an invalid ID", () => {
+    return request(app)
+      .delete("/api/comments/SELECT * FROM cards")
+      .then((response) => {
+        expect(response.body.msg).toBe("bad request!");
+      });
+  });
+  test("DELETE - status 404 - will give 400 when given a valid ID that doesn't exist", () => {
+    return request(app)
+      .delete("/api/comments/3000")
+      .then((response) => {
+        expect(response.body.msg).toBe("id not found");
+      });
+  });
+});
+
