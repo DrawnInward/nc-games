@@ -20,6 +20,33 @@ exports.selectReviews = () => {
     });
 };
 
+
+exports.createComments = (newComment, review_id) => {
+  const { username, body } = newComment;
+
+  const newCommentQuery = `
+INSERT INTO comments
+(body, author, review_id)
+VALUES
+($1, $2, $3)
+returning*;
+`;
+
+  if (
+    Object.keys(newComment).length !== 2 ||
+    typeof username !== "string" ||
+    typeof body !== "string"
+  ) {
+    return Promise.reject({ status: 400, msg: "bad request!" });
+  }
+
+  return checkReviewIdExists(review_id).then(() => {
+    return db
+      .query(newCommentQuery, [body, username, review_id])
+      .then((response) => {
+        return response.rows[0];
+      });
+
 exports.selectComments = (id) => {
   const reviewQuery = `
     SELECT * FROM comments
