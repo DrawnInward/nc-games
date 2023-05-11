@@ -182,22 +182,21 @@ describe("PATCH /api/reviews/:review_id", () => {
         expect(Object.keys(review).length).toBe(9);
         expect(review.owner).toBe("bainesface");
         expect(review.votes).toBe(-95);
-        });
+      });
   });
-      
-       test("will give 400 when given an invalid ID", () => {
-     return request(app)
-  .patch("/api/reviews/SELECT * FROM cards") --handle this erro
-  .expect(400)
+
+  test("will give 400 when given an invalid ID", () => {
+    return request(app)
+      .patch("/api/reviews/SELECT * FROM cards")
+      .expect(400)
       .then((response) => {
         expect(response.body.msg).toBe("bad request!");
       });
   });
-  
-  
+
   test("will give 400 when request object is not formatted correctly", () => {
     return request(app)
-  .patch("/api/reviews/3") --and this
+      .patch("/api/reviews/3")
       .expect(400)
       .send({
         username: "mallionaire",
@@ -205,25 +204,23 @@ describe("PATCH /api/reviews/:review_id", () => {
         votes: 10000000000,
       })
       .then((response) => {
-      expect(response.body.msg).toBe("bad request!");
-        });
+        expect(response.body.msg).toBe("bad request!");
+      });
   });
-  
+
   test("will return 404 when given a valid id that does not exist", () => {
     return request(app)
       .patch("/api/reviews/3000")
       .expect(404)
       .send({
         inc_votes: -100,
-        })
+      })
       .then((response) => {
         const { comment } = response.body;
         expect(response.body.msg).toBe("review id not found");
       });
   });
 });
-      
-      
 
 describe("POST /api/reviews/:review_id/comments", () => {
   test("POST - status: 201 - adds a new comment and responds with the newly created comment object with the correct properties", () => {
@@ -292,17 +289,17 @@ describe("POST /api/reviews/:review_id/comments", () => {
         body: "Ah what a wonderful game! So simple I could play it with both of my hands full, as they were all night, with wine.",
       })
       .then((response) => {
-        const { comment } = response.body;
         expect(response.body.msg).toBe("review id not found");
       });
   });
 });
 describe("/api/reviews/:review_id/comments", () => {
-  test("should return the review with the correct properties", () => {
+  test.only("should return the review with the correct properties", () => {
     return request(app)
       .get("/api/reviews/2/comments")
       .expect(200)
       .then((response) => {
+        console.log(response.body);
         response.body.comments.forEach((comment) => {
           expect(comment).toHaveProperty("comment_id");
           expect(comment).toHaveProperty("votes");

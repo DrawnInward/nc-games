@@ -2,9 +2,8 @@ const {
   selectReviews,
   createComments,
   selectComments,
-    changeVotes
+  changeVotes,
 } = require("../models/reviews.models");
-
 
 exports.getReviews = (req, res) => {
   selectReviews().then((reviews) => {
@@ -12,13 +11,17 @@ exports.getReviews = (req, res) => {
   });
 };
 
-
 exports.incrementVotes = (req, res, next) => {
   const votes = req.body;
   const { review_id } = req.params;
   changeVotes(votes, review_id)
     .then((result) => {
       res.status(200).send({ review: result });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
 
 exports.postComments = (req, res, next) => {
   const newComment = req.body;

@@ -20,7 +20,6 @@ app.patch("/api/reviews/:review_id", incrementVotes);
 app.post("/api/reviews/:review_id/comments", postComments);
 app.get("/api/reviews/:review_id/comments", getComments);
 
-
 app.use((err, req, res, next) => {
   if (err.code === "22P02") {
     res.status(400).send({ msg: "bad request!" });
