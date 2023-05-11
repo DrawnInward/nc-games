@@ -153,7 +153,6 @@ describe("GET /api/reviews", () => {
         expect(response.body.reviews).toBeSorted({ descending: true });
       });
   });
-  
 });
 
 describe("POST /api/reviews/:review_id/comments", () => {
@@ -230,8 +229,6 @@ describe("POST /api/reviews/:review_id/comments", () => {
   });
 });
 
-});
-
 describe("/api/reviews/:review_id/comments", () => {
   test("should return the review with the correct properties", () => {
     return request(app)
@@ -253,7 +250,7 @@ describe("/api/reviews/:review_id/comments", () => {
       .get("/api/reviews/2000/comments")
       .expect(404)
       .then((response) => {
-        expect(response.body.msg).toBe("review not found");
+        expect(response.body.msg).toBe("review id not found");
       });
   });
   test("will return 200 when given an id that does exist but has no comments associated with it", () => {
@@ -281,4 +278,3 @@ describe("/api/reviews/:review_id/comments", () => {
       });
   });
 });
-

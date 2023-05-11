@@ -20,7 +20,6 @@ exports.selectReviews = () => {
     });
 };
 
-
 exports.createComments = (newComment, review_id) => {
   const { username, body } = newComment;
 
@@ -46,6 +45,8 @@ returning*;
       .then((response) => {
         return response.rows[0];
       });
+  });
+};
 
 exports.selectComments = (id) => {
   const reviewQuery = `
