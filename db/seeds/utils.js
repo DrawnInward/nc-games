@@ -27,9 +27,9 @@ exports.checkReviewIdExists = (id) => {
   return db
     .query(
       `
-		SELECT * from reviews
-		WHERE review_id = $1;
-		`,
+	  SELECT * from reviews
+	  WHERE review_id = $1;
+	  `,
       [id]
     )
     .then((result) => {
