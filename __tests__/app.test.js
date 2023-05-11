@@ -200,4 +200,31 @@ describe("POST /api/reviews/:review_id/comments", () => {
         expect(response.body.msg).toBe("bad request!");
       });
   });
+  test("will give 400 when request object is not formatted correctly", () => {
+    return request(app)
+      .post("/api/reviews/3/comments")
+      .expect(400)
+      .send({
+        username: "mallionaire",
+        body: "Ah what a wonderful game! So simple I could play it with both of my hands full, as they were all night, with wine.",
+        votes: 10000000000,
+      })
+      .then((response) => {
+        const { comment } = response.body;
+        expect(response.body.msg).toBe("bad request!");
+      });
+  });
+  test.only("will return 404 when given a valid id that does not exist", () => {
+    return request(app)
+      .post("/api/reviews/3000/comments")
+      .expect(404)
+      .send({
+        username: "mallionaire",
+        body: "Ah what a wonderful game! So simple I could play it with both of my hands full, as they were all night, with wine.",
+      })
+      .then((response) => {
+        const { comment } = response.body;
+        expect(response.body.msg).toBe("review id not found");
+      });
+  });
 });

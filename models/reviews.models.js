@@ -1,4 +1,5 @@
 const db = require("../db/connection");
+const { checkReviewIdExists } = require("../db/seeds/utils");
 
 exports.selectReviews = () => {
   const query = `SELECT reviews.owner, reviews.title, reviews.review_id, reviews.category, reviews.review_img_url, reviews.created_at, reviews.votes, reviews.designer, COUNT(comments.comment_id) comment_count
@@ -30,9 +31,19 @@ VALUES
 returning*;
 `;
 
-  return db
-    .query(newCommentQuery, [body, username, review_id])
-    .then((response) => {
-      return response.rows[0];
-    });
+  if (
+    Object.keys(newComment).length !== 2 ||
+    typeof username !== "string" ||
+    typeof body !== "string"
+  ) {
+    return Promise.reject({ status: 400, msg: "bad request!" });
+  }
+
+  return checkReviewIdExists(review_id).then(() => {
+    return db
+      .query(newCommentQuery, [body, username, review_id])
+      .then((response) => {
+        return response.rows[0];
+      });
+  });
 };
