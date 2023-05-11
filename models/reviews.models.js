@@ -20,6 +20,7 @@ exports.selectReviews = () => {
     });
 };
 
+
 exports.createComments = (newComment, review_id) => {
   const { username, body } = newComment;
 
@@ -57,6 +58,27 @@ exports.selectComments = (id) => {
   return checkReviewIdExists(id).then(() => {
     return db.query(reviewQuery, [id]).then((result) => {
       return result.rows;
+    });
+  });
+};
+
+
+exports.changeVotes = (votes, id) => {
+  const { inc_votes } = votes;
+  const changeVotesQuery = `
+  UPDATE reviews
+  SET votes = votes + $1
+  WHERE review_id = $2
+  returning*
+  `;
+
+  if (Object.keys(votes).length !== 1 || typeof inc_votes !== "number") {
+    return Promise.reject({ status: 400, msg: "bad request!" });
+  }
+
+  return checkReviewIdExists(id).then(() => {
+    return db.query(changeVotesQuery, [inc_votes, id]).then((result) => {
+      return result.rows[0];
     });
   });
 };

@@ -1,12 +1,12 @@
 const express = require("express");
 const { getCategories } = require("../controllers/categories.controllers");
 const { getEndpoints } = require("../controllers/api.controllers");
-
 const { getReview } = require("../controllers/review.controllers");
 const {
   getReviews,
   postComments,
   getComments,
+  incrementVotes,
 } = require("../controllers/reviews.controllers");
 
 const app = express();
@@ -16,8 +16,10 @@ app.get("/api/categories", getCategories);
 app.get("/api", getEndpoints);
 app.get("/api/reviews/:review_id", getReview);
 app.get("/api/reviews", getReviews);
+app.patch("/api/reviews/:review_id", incrementVotes);
 app.post("/api/reviews/:review_id/comments", postComments);
 app.get("/api/reviews/:review_id/comments", getComments);
+
 
 app.use((err, req, res, next) => {
   if (err.code === "22P02") {

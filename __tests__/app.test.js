@@ -155,6 +155,76 @@ describe("GET /api/reviews", () => {
   });
 });
 
+describe("PATCH /api/reviews/:review_id", () => {
+  test("PATCH - status: 200 - updates votes correctly if votes increment is positive, on the correct object", () => {
+    return request(app)
+      .patch("/api/reviews/2")
+      .expect(200)
+      .send({
+        inc_votes: 15,
+      })
+      .then((response) => {
+        const { review } = response.body;
+        expect(Object.keys(review).length).toBe(9);
+        expect(review.owner).toBe("philippaclaire9");
+        expect(review.votes).toBe(20);
+      });
+  });
+  test("PATCH - status: 200 - updates votes correctly if votes increment is negative, on the correct object", () => {
+    return request(app)
+      .patch("/api/reviews/3")
+      .expect(200)
+      .send({
+        inc_votes: -100,
+      })
+      .then((response) => {
+        const { review } = response.body;
+        expect(Object.keys(review).length).toBe(9);
+        expect(review.owner).toBe("bainesface");
+        expect(review.votes).toBe(-95);
+        });
+  });
+      
+       test("will give 400 when given an invalid ID", () => {
+     return request(app)
+  .patch("/api/reviews/SELECT * FROM cards") --handle this erro
+  .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("bad request!");
+      });
+  });
+  
+  
+  test("will give 400 when request object is not formatted correctly", () => {
+    return request(app)
+  .patch("/api/reviews/3") --and this
+      .expect(400)
+      .send({
+        username: "mallionaire",
+        body: "Ah what a wonderful game! So simple I could play it with both of my hands full, as they were all night, with wine.",
+        votes: 10000000000,
+      })
+      .then((response) => {
+      expect(response.body.msg).toBe("bad request!");
+        });
+  });
+  
+  test("will return 404 when given a valid id that does not exist", () => {
+    return request(app)
+      .patch("/api/reviews/3000")
+      .expect(404)
+      .send({
+        inc_votes: -100,
+        })
+      .then((response) => {
+        const { comment } = response.body;
+        expect(response.body.msg).toBe("review id not found");
+      });
+  });
+});
+      
+      
+
 describe("POST /api/reviews/:review_id/comments", () => {
   test("POST - status: 201 - adds a new comment and responds with the newly created comment object with the correct properties", () => {
     return request(app)
@@ -210,7 +280,6 @@ describe("POST /api/reviews/:review_id/comments", () => {
         votes: 10000000000,
       })
       .then((response) => {
-        const { comment } = response.body;
         expect(response.body.msg).toBe("bad request!");
       });
   });
@@ -228,7 +297,6 @@ describe("POST /api/reviews/:review_id/comments", () => {
       });
   });
 });
-
 describe("/api/reviews/:review_id/comments", () => {
   test("should return the review with the correct properties", () => {
     return request(app)
