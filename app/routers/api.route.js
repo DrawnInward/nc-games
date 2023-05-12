@@ -1,4 +1,4 @@
-const { getEndpoints } = require("../controllers/api.controllers");
+const { getEndpoints } = require("../../controllers/api.controllers");
 const reviewsRouter = require("./reviews.route");
 const userRouter = require("./users.routes");
 const commentsRouter = require("./comments.route");

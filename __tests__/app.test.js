@@ -297,7 +297,7 @@ describe("PATCH /api/reviews/:review_id", () => {
       })
       .then((response) => {
         const { comment } = response.body;
-        expect(response.body.msg).toBe("review id not found");
+        expect(response.body.msg).toBe("invalid field entered");
       });
   });
 });
@@ -369,7 +369,7 @@ describe("POST /api/reviews/:review_id/comments", () => {
         body: "Ah what a wonderful game! So simple I could play it with both of my hands full, as they were all night, with wine.",
       })
       .then((response) => {
-        expect(response.body.msg).toBe("review id not found");
+        expect(response.body.msg).toBe("invalid field entered");
       });
   });
 });
@@ -394,7 +394,7 @@ describe("/api/reviews/:review_id/comments", () => {
       .get("/api/reviews/2000/comments")
       .expect(404)
       .then((response) => {
-        expect(response.body.msg).toBe("review id not found");
+        expect(response.body.msg).toBe("invalid field entered");
       });
   });
   test("will return 200 when given an id that does exist but has no comments associated with it", () => {

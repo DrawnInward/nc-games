@@ -1,5 +1,5 @@
 const db = require("../db/connection");
-const { checkFieldExists } = require("../db/seeds/utils");
+const { checkFieldExists } = require("../app/utils");
 
 exports.selectUsers = () => {
   const userQuery = "SELECT * FROM users;";

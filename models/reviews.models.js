@@ -1,5 +1,5 @@
 const db = require("../db/connection");
-const { checkReviewIdExists, checkFieldExists } = require("../db/seeds/utils");
+const { checkFieldExists } = require("../app/utils");
 
 exports.selectReviews = (category, sort_by = "created_at", order = "desc") => {
   const greenList = [
@@ -73,7 +73,7 @@ returning*;
     return Promise.reject({ status: 400, msg: "bad request!" });
   }
 
-  return checkReviewIdExists(review_id).then(() => {
+  return checkFieldExists("reviews", "review_id", review_id).then(() => {
     return db
       .query(newCommentQuery, [body, username, review_id])
       .then((response) => {
@@ -88,7 +88,7 @@ exports.selectComments = (id) => {
     WHERE review_id = $1
     ORDER BY created_at DESC`;
 
-  return checkReviewIdExists(id).then(() => {
+  return checkFieldExists("reviews", "review_id", id).then(() => {
     return db.query(reviewQuery, [id]).then((result) => {
       return result.rows;
     });
@@ -108,7 +108,7 @@ exports.changeVotes = (votes, id) => {
     return Promise.reject({ status: 400, msg: "bad request!" });
   }
 
-  return checkReviewIdExists(id).then(() => {
+  return checkFieldExists("reviews", "review_id", id).then(() => {
     return db.query(changeVotesQuery, [inc_votes, id]).then((result) => {
       return result.rows[0];
     });

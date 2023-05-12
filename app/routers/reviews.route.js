@@ -5,10 +5,12 @@ const {
   getComments,
   incrementVotes,
   getReview,
-} = require("../controllers/reviews.controllers");
+} = require("../../controllers/reviews.controllers");
 
 reviewsRouter.route("/:review_id").get(getReview).patch(incrementVotes);
+
 reviewsRouter.route("/:review_id/comments").post(postComments).get(getComments);
+
 reviewsRouter.route("").get(getReviews);
 
 module.exports = reviewsRouter;

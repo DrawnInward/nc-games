@@ -4,7 +4,7 @@ const {
   handleCustomError,
   catchAllError,
 } = require("./errorHandling");
-const apiRouter = require("../routers/api.route");
+const apiRouter = require("./routers/api.route");
 
 const app = express();
 
