@@ -75,6 +75,7 @@ describe("/api/reviews/:review_id", () => {
       .get("/api/reviews/2")
       .expect(200)
       .then((response) => {
+        expect(Object.keys(response.body.review).length).toBe(10);
         expect(response.body.review).toHaveProperty("review_id");
         expect(response.body.review).toHaveProperty("title");
         expect(response.body.review).toHaveProperty("review_body");
@@ -84,6 +85,7 @@ describe("/api/reviews/:review_id", () => {
         expect(response.body.review).toHaveProperty("category");
         expect(response.body.review).toHaveProperty("owner");
         expect(response.body.review).toHaveProperty("created_at");
+        expect(response.body.review).toHaveProperty("comment_count");
       });
   });
   test("will return 404 when given a valid id that does not exist", () => {
@@ -91,7 +93,7 @@ describe("/api/reviews/:review_id", () => {
       .get("/api/reviews/2000")
       .expect(404)
       .then((response) => {
-        expect(response.body.msg).toBe("review not found");
+        expect(response.body.msg).toBe("invalid field entered");
       });
   });
   test("will give 400 when given an invalid ID ", () => {
@@ -100,6 +102,14 @@ describe("/api/reviews/:review_id", () => {
       .expect(400)
       .then((response) => {
         expect(response.body.msg).toBe("bad request!");
+      });
+  });
+  test("should return the count of all comments associated with this review id under the comment_count key", () => {
+    return request(app)
+      .get("/api/reviews/2")
+      .expect(200)
+      .then((response) => {
+        expect(response.body.review.comment_count).toBe("3");
       });
   });
 });
