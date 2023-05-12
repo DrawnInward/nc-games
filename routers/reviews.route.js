@@ -1,4 +1,4 @@
-const express = require("express");
+const reviewsRouter = require("express").Router();
 const {
   getReviews,
   postComments,
@@ -6,12 +6,9 @@ const {
   incrementVotes,
   getReview,
 } = require("../controllers/reviews.controllers");
-const router = express.Router();
 
-router.route("/:review_id").get(getReview).patch(incrementVotes);
+reviewsRouter.route("/:review_id").get(getReview).patch(incrementVotes);
+reviewsRouter.route("/:review_id/comments").post(postComments).get(getComments);
+reviewsRouter.route("").get(getReviews);
 
-router.route("/:review_id/comments").post(postComments).get(getComments);
-
-router.route("").get(getReviews);
-
-module.exports = router;
+module.exports = reviewsRouter;
