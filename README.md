@@ -59,27 +59,6 @@ GET /api/reviews
     Queries: category, sort_by, order
     Example Response:
 
-Sure! Here's a sample README file for your project:
-Board Game Database Backend
-
-This project is the backend for a board game database. It provides an API to manage board game reviews, categories, and comments. The project is built using Node.js v19.7.0, PostgreSQL 14.7, and the Express.js framework.
-Endpoints
-
-The following endpoints are available in the API:
-GET /api
-
-    Description: Serves up a JSON representation of all the available endpoints of the API, this includes example responses of each endpoint.
-
-GET /api/categories
-
-    Description: Serves an array of all categories.
-    Queries: None
-
-GET /api/reviews
-
-    Description: Serves an array of all reviews.
-    Queries: category, sort_by, order
-
 GET /api/reviews/:review_id
 
     Description: Serves a specific review object relevant to the inputted review ID.
@@ -91,9 +70,9 @@ PATCH /api/reviews/:review_id
     Queries: None
     Example request format:
 
-{
-"inc_votes": 10
-}
+    {
+    "inc_votes": 10
+    }
 
 POST /api/reviews/:review_id/comments
 
@@ -101,10 +80,10 @@ POST /api/reviews/:review_id/comments
     Queries: None
     Example request format:
 
-{
-"username": "mallionaire",
-"body": "Ah what a wonderful game! So simple I could play it with both of my hands full, as they were all night, with wine."
-}
+    {
+    "username": "mallionaire",
+    "body": "Ah what a wonderful game! So simple I could play it with both of my hands full, as they were all night, with wine."
+    }
 
 DELETE /api/comments/:comment_id
 
