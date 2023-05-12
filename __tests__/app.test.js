@@ -432,3 +432,24 @@ describe("DELETE /api/comments/:comment_id", () => {
       });
   });
 });
+
+
+describe("GET /api/users", () => {
+  test("GET 200 status from endpoint", () => {
+    return request(app).get("/api/users").expect(200);
+  });
+  test("GET 200 returns correct keys", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then((response) => {
+        expect(response.body.users.length).toBe(4);
+        expect(Object.keys(response.body.users[0]).length).toBe(3);
+        response.body.users.forEach((user) => {
+          expect(user).toHaveProperty("username");
+          expect(user).toHaveProperty("name");
+          expect(user).toHaveProperty("avatar_url");
+        });
+      });
+  });
+});
