@@ -461,4 +461,26 @@ describe("GET /api/users", () => {
         });
       });
   });
+
+  describe("/api/users/:username", () => {
+    test("should return the user with the correct properties", () => {
+      return request(app)
+        .get("/api/users/philippaclaire9")
+        .expect(200)
+        .then((response) => {
+          expect(Object.keys(response.body.user).length).toBe(3);
+          expect(response.body.user).toHaveProperty("username");
+          expect(response.body.user).toHaveProperty("avatar_url");
+          expect(response.body.user).toHaveProperty("name");
+        });
+    });
+    test("will return 404 when given a valid id that does not exist", () => {
+      return request(app)
+        .get("/api/users/harold")
+        .expect(404)
+        .then((response) => {
+          expect(response.body.msg).toBe("invalid field entered");
+        });
+    });
+  });
 });
