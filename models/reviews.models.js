@@ -1,25 +1,58 @@
 const db = require("../db/connection");
-const { checkReviewIdExists } = require("../db/seeds/utils");
+const { checkReviewIdExists, checkFieldExists } = require("../db/seeds/utils");
 
-exports.selectReviews = () => {
-  const query = `SELECT reviews.owner, reviews.title, reviews.review_id, reviews.category, reviews.review_img_url, reviews.created_at, reviews.votes, reviews.designer, COUNT(comments.comment_id) comment_count
+exports.selectReviews = (category, sort_by = "created_at", order = "desc") => {
+  const greenList = [
+    "title",
+    "designer",
+    "owner",
+    "category",
+    "created_at",
+    "votes",
+  ];
+
+  if (!greenList.includes(sort_by))
+    return Promise.reject({
+      status: 400,
+      msg: "invalid column",
+    });
+
+  const queryValues = [];
+
+  let query = `SELECT reviews.owner, reviews.title, reviews.review_id, reviews.category, reviews.review_img_url, reviews.created_at, reviews.votes, reviews.designer, COUNT(comments.comment_id) comment_count
   FROM reviews
   LEFT JOIN comments ON comments.review_id = reviews.review_id
-  GROUP BY reviews.owner, reviews.title, reviews.review_id, reviews.category, reviews.review_img_url, reviews.created_at, reviews.votes, reviews.designer
-  ORDER BY created_at DESC;`;
-  return db
-    .query(query)
-    .then((result) => {
-      return result.rows;
-    })
-    .catch((err) => {
-      return Promise.reject({
-        status: 500,
-        msg: "failed to select reviews",
-      });
-    });
-};
+  `;
 
+  if (category) {
+    queryValues.push(category);
+    query += ` WHERE category = $1`;
+  }
+
+  query += ` GROUP BY reviews.owner, reviews.title, reviews.review_id, reviews.category, reviews.review_img_url, reviews.created_at, reviews.votes, reviews.designer
+  `;
+
+  query += ` ORDER BY ${sort_by}`;
+
+  if (order === "desc") {
+    query += ` DESC`;
+  } else if (order === "asc") {
+    query += ` ASC`;
+  } else {
+    return Promise.reject({
+      status: 400,
+      msg: "invalid order",
+    });
+  }
+
+  query += ";";
+
+  return checkFieldExists("categories", "slug", category).then(() => {
+    return db.query(query, queryValues).then((result) => {
+      return result.rows;
+    });
+  });
+};
 
 exports.createComments = (newComment, review_id) => {
   const { username, body } = newComment;
@@ -61,7 +94,6 @@ exports.selectComments = (id) => {
     });
   });
 };
-
 
 exports.changeVotes = (votes, id) => {
   const { inc_votes } = votes;
