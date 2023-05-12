@@ -150,10 +150,79 @@ describe("GET /api/reviews", () => {
       .get("/api/reviews")
       .expect(200)
       .then((response) => {
-        expect(response.body.reviews).toBeSorted({ descending: true });
+        expect(response.body.reviews).toBeSorted("created_at", {
+          descending: true,
+          coerce: true,
+        });
       });
   });
-
+  test("GET status 200 can select social deduction category", () => {
+    return request(app)
+      .get("/api/reviews?category=social%20deduction")
+      .expect(200)
+      .then((response) => {
+        expect(response.body.reviews.length).toBe(11);
+        response.body.reviews.forEach((review) => {
+          expect(review.category).toBe("social deduction");
+        });
+      });
+  });
+  test("GET status 200 can select dexterity category", () => {
+    return request(app)
+      .get("/api/reviews?category=dexterity")
+      .expect(200)
+      .then((response) => {
+        expect(response.body.reviews.length).toBe(1);
+        response.body.reviews.forEach((review) => {
+          expect(review.category).toBe("dexterity");
+        });
+      });
+  });
+  test("GET status 200 can sort by votes column", () => {
+    return request(app)
+      .get("/api/reviews?sort_by=votes")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.reviews).toBeSortedBy("votes", {
+          coerce: true,
+          descending: true,
+        });
+      });
+  });
+  test("GET status 200 can sort by designer column", () => {
+    return request(app)
+      .get("/api/reviews?sort_by=designer")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.reviews).toBeSortedBy("designer", { descending: true });
+      });
+  });
+  test("GET status 200 order query works with ascending", () => {
+    return request(app)
+      .get("/api/reviews?order=asc")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.reviews).toBeSortedBy("created_at", {
+          ascending: true,
+        });
+      });
+  });
+  test("GET status 404 if catergory doesn't exist in the database", () => {
+    return request(app)
+      .get("/api/reviews?category=select cards from creditcards;")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("invalid field entered");
+      });
+  });
+  test("GET status 400 if passed an order that is not asc or desc", () => {
+    return request(app)
+      .get("/api/reviews?order=select cards from creditcards;")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("invalid order");
+      });
+  });
 });
 
 describe("PATCH /api/reviews/:review_id", () => {
@@ -221,7 +290,6 @@ describe("PATCH /api/reviews/:review_id", () => {
         expect(response.body.msg).toBe("review id not found");
       });
   });
-
 });
 
 describe("POST /api/reviews/:review_id/comments", () => {
@@ -345,7 +413,6 @@ describe("/api/reviews/:review_id/comments", () => {
   });
 });
 
-
 describe("DELETE /api/comments/:comment_id", () => {
   test("DELETE - status 204 - will return 204 and no content", () => {
     return request(app).delete("/api/comments/3").expect(204);
@@ -361,8 +428,7 @@ describe("DELETE /api/comments/:comment_id", () => {
     return request(app)
       .delete("/api/comments/3000")
       .then((response) => {
-        expect(response.body.msg).toBe("id not found");
+        expect(response.body.msg).toBe("invalid field entered");
       });
   });
 });
-

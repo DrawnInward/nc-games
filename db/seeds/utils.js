@@ -40,7 +40,7 @@ exports.checkReviewIdExists = (id) => {
     });
 };
 
-exports.checkIdExists = (table, column, id) => {
+exports.checkFieldExists = (table, column, id) => {
   return db
     .query(
       `
@@ -51,7 +51,7 @@ exports.checkIdExists = (table, column, id) => {
     )
     .then((result) => {
       if (result.rows.length === 0 && id) {
-        return Promise.reject({ status: 404, msg: "id not found" });
+        return Promise.reject({ status: 404, msg: "invalid field entered" });
       }
     });
 };
