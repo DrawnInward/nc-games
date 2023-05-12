@@ -433,7 +433,6 @@ describe("DELETE /api/comments/:comment_id", () => {
   });
 });
 
-
 describe("GET /api/users", () => {
   test("GET 200 status from endpoint", () => {
     return request(app).get("/api/users").expect(200);
