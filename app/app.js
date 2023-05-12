@@ -1,48 +1,33 @@
-const express = require("express");
 const { getCategories } = require("../controllers/categories.controllers");
 const { getEndpoints } = require("../controllers/api.controllers");
-const { getReview } = require("../controllers/review.controllers");
-const {
-  getReviews,
-  postComments,
-  getComments,
-  incrementVotes,
-} = require("../controllers/reviews.controllers");
+const { getReviews } = require("../controllers/reviews.controllers");
 const { deleteComment } = require("../controllers/comments.controllers");
-const userRouter = require("../routers/users.routes");
+const express = require("express");
+const reviews = require("../routers/reviews.route");
+const {
+  invalidSqlInputError,
+  handleCustomError,
+  catchAllError,
+} = require("../errorHandling");
 const app = express();
 app.use(express.json());
+
+app.use("/api/reviews", reviews);
+
+const userRouter = require("../routers/users.routes");
 
 app.use("/api/users", userRouter);
 
 app.get("/api/categories", getCategories);
+
 app.get("/api", getEndpoints);
-app.get("/api/reviews/:review_id", getReview);
-app.get("/api/reviews", getReviews);
-app.patch("/api/reviews/:review_id", incrementVotes);
-app.post("/api/reviews/:review_id/comments", postComments);
-app.get("/api/reviews/:review_id/comments", getComments);
+app.get("/api/categories", getCategories);
 app.delete("/api/comments/:comment_id", deleteComment);
 
-app.use((err, req, res, next) => {
-  if (err.code === "22P02") {
-    res.status(400).send({ msg: "bad request!" });
-  } else {
-    next(err);
-  }
-});
+app.use(invalidSqlInputError);
 
-app.use((err, req, res, next) => {
-  if (err.status && err.msg) {
-    res.status(err.status).send({ msg: err.msg });
-  } else {
-    next(err);
-  }
-});
+app.use(handleCustomError);
 
-app.use((err, req, res, next) => {
-  console.log(err);
-  res.status(500).send({ msg: "server error!" });
-});
+app.use(catchAllError);
 
 module.exports = app;

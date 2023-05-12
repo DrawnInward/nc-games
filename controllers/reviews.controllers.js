@@ -3,6 +3,7 @@ const {
   createComments,
   selectComments,
   changeVotes,
+  selectReview,
 } = require("../models/reviews.models");
 
 exports.getReviews = (req, res, next) => {
@@ -45,6 +46,17 @@ exports.getComments = (req, res, next) => {
   selectComments(review_id)
     .then((comments) => {
       res.status(200).send({ comments: comments });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.getReview = (req, res, next) => {
+  const { review_id } = req.params;
+  selectReview(review_id)
+    .then((review) => {
+      res.status(200).send({ review: review });
     })
     .catch((err) => {
       next(err);
