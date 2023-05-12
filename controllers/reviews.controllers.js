@@ -5,10 +5,15 @@ const {
   changeVotes,
 } = require("../models/reviews.models");
 
-exports.getReviews = (req, res) => {
-  selectReviews().then((reviews) => {
-    res.status(200).send({ reviews: reviews });
-  });
+exports.getReviews = (req, res, next) => {
+  const { category, sort_by, order } = req.query;
+  selectReviews(category, sort_by, order)
+    .then((reviews) => {
+      res.status(200).send({ reviews: reviews });
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
 
 exports.incrementVotes = (req, res, next) => {
