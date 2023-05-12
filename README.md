@@ -10,9 +10,12 @@ This project is the backend for a board game database. It provides an API to man
 
 2. Ensure you are in the project directory and make sure you have Node.js installed on your machine.
 
-3. Install the project dependencies using npm install.
+3. Install the project dependencies using
+
+   npm install.
 
 4. Create two .env files in the project root directory: .env.test and .env.development. Open each .env file and add the following lines to the test and development files respectivey.
+
    PGDATABASE=nc_games_test
    PGDATABASE=nc_games
 
@@ -24,11 +27,11 @@ Make sure to add the .env files to your .gitignore file to prevent them from bei
 
 2. Run the following command to set up the necessary database tables:
 
-npm run setup-dbs
+   npm run setup-dbs
 
 3. Seed the local database with sample data by running the following command:
 
-npm run seed
+   npm run seed
 
 ###Running tests.
 
@@ -87,8 +90,6 @@ POST /api/reviews/:review_id/comments
 
 DELETE /api/comments/:comment_id
 
-Description: Deletes a comment by the comment ID from the database.
+    Description: Deletes a comment by the comment ID from the database.
 
-Queries: None
-
-Example Request:
+    Queries: None
