@@ -1,2 +1,1 @@
-
-
+You are now connected to database "nc_games_test" as user "silenus".

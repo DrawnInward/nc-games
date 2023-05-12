@@ -9,10 +9,11 @@ const {
   incrementVotes,
 } = require("../controllers/reviews.controllers");
 const { deleteComment } = require("../controllers/comments.controllers");
-const { getUsers } = require("../controllers/users.controllers");
-
+const userRouter = require("../routers/users.routes");
 const app = express();
 app.use(express.json());
+
+app.use("/api/users", userRouter);
 
 app.get("/api/categories", getCategories);
 app.get("/api", getEndpoints);
@@ -22,7 +23,6 @@ app.patch("/api/reviews/:review_id", incrementVotes);
 app.post("/api/reviews/:review_id/comments", postComments);
 app.get("/api/reviews/:review_id/comments", getComments);
 app.delete("/api/comments/:comment_id", deleteComment);
-app.get("/api/users", getUsers);
 
 app.use((err, req, res, next) => {
   if (err.code === "22P02") {
