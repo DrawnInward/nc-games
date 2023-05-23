@@ -484,3 +484,70 @@ describe("GET /api/users", () => {
     });
   });
 });
+
+describe.only("PATCH /api/comments/:comment_id", () => {
+  test("PATCH - status: 200 - updates votes correctly if votes increment is positive, on the correct object", () => {
+    return request(app)
+      .patch("/api/comments/2")
+      .expect(200)
+      .send({
+        inc_votes: 15,
+      })
+      .then((response) => {
+        const { comment } = response.body;
+        expect(Object.keys(comment).length).toBe(6);
+        expect(comment.author).toBe("mallionaire");
+        expect(comment.votes).toBe(28);
+      });
+  });
+  test("PATCH - status: 200 - updates votes correctly if votes increment is negative, on the correct object", () => {
+    return request(app)
+      .patch("/api/comments/3")
+      .expect(200)
+      .send({
+        inc_votes: -100,
+      })
+      .then((response) => {
+        const { comment } = response.body;
+        expect(Object.keys(comment).length).toBe(6);
+        expect(comment.author).toBe("philippaclaire9");
+        expect(comment.votes).toBe(-90);
+      });
+  });
+
+  test("will give 400 when given an invalid ID", () => {
+    return request(app)
+      .patch("/api/comments/SELECT * FROM cards")
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("bad request!");
+      });
+  });
+
+  test("will give 400 when request object is not formatted correctly", () => {
+    return request(app)
+      .patch("/api/comments/3")
+      .expect(400)
+      .send({
+        username: "mallionaire",
+        body: "Ah what a wonderful game! So simple I could play it with both of my hands full, as they were all night, with wine.",
+        votes: 10000000000,
+      })
+      .then((response) => {
+        expect(response.body.msg).toBe("bad request!");
+      });
+  });
+
+  test("will return 404 when given a valid id that does not exist", () => {
+    return request(app)
+      .patch("/api/comments/3000")
+      .expect(404)
+      .send({
+        inc_votes: -100,
+      })
+      .then((response) => {
+        const { comment } = response.body;
+        expect(response.body.msg).toBe("invalid field entered");
+      });
+  });
+});

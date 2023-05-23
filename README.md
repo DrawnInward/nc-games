@@ -6,7 +6,9 @@ This project is the backend for a board game database. It provides an API to man
 
 ###Cloning the repository, installing dependencies, and creating .env files.
 
-1. Clone the project repository from GitHub using git clone https://github.com/DrawnInward/nc-games
+1. Fork and/or clone the project repository from GitHub using
+
+   git clone https://github.com/DrawnInward/nc-games
 
 2. Ensure you are in the project directory and make sure you have Node.js installed on your machine.
 
