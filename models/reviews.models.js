@@ -9,6 +9,7 @@ exports.selectReviews = (category, sort_by = "created_at", order = "desc") => {
     "category",
     "created_at",
     "votes",
+    "comment_count",
   ];
 
   if (!greenList.includes(sort_by))
