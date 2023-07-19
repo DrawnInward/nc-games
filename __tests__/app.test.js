@@ -563,9 +563,64 @@ describe("POST /api/users", () => {
   });
 });
 
-/* describe("PATCH /api/users/:username", () => {
-  test("");
-}); */
+describe("PATCH /api/users/:username", () => {
+  test("status 200 -- should modify one given field", () => {
+    return request(app)
+      .patch("/api/users/philippaclaire9")
+      .expect(200)
+      .send({ name: "Cullera" })
+      .then((response) => {
+        const { updatedUser } = response.body;
+        expect(Object.keys(updatedUser).length).toBe(4);
+        expect(updatedUser.username).toBe("philippaclaire9");
+        expect(updatedUser.name).toBe("Cullera");
+      });
+  });
+  test("status 200 -- should modify more than one field is supplied", () => {
+    return request(app)
+      .patch("/api/users/philippaclaire9")
+      .expect(200)
+      .send({
+        name: "Cullera",
+        avatar_url:
+          "https://images.unsplash.com/photo-1575936123452-b67c3203c357?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aW1hZ2V8ZW58MHx8MHx8fDA%3D&w=1000&q=80",
+      })
+      .then((response) => {
+        const { updatedUser } = response.body;
+        expect(Object.keys(updatedUser).length).toBe(4);
+        expect(updatedUser.username).toBe("philippaclaire9");
+        expect(updatedUser.name).toBe("Cullera");
+        expect(updatedUser.avatar_url).toBe(
+          "https://images.unsplash.com/photo-1575936123452-b67c3203c357?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aW1hZ2V8ZW58MHx8MHx8fDA%3D&w=1000&q=80"
+        );
+      });
+  });
+  test("status 400 -- should throw correct error if fileds are sent that are not in greenlist", () => {
+    return request(app)
+      .patch("/api/users/philippaclaire9")
+      .expect(400)
+      .send({
+        messageToJon:
+          "Remember that excellence, like all things, is a habit. And rememebr that you are not excellent (yet)",
+      })
+      .then((response) => {
+        expect(response.body.msg).toBe("Bad request! Invalid fields.");
+      });
+  });
+  test("status 400 -- should throw correct error any value is not a string", () => {
+    return request(app)
+      .patch("/api/users/philippaclaire9")
+      .expect(400)
+      .send({
+        name: true,
+        avatar_url:
+          "https://images.unsplash.com/photo-1575936123452-b67c3203c357?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aW1hZ2V8ZW58MHx8MHx8fDA%3D&w=1000&q=80",
+      })
+      .then((response) => {
+        expect(response.body.msg).toBe("Bad request! Invalid fields.");
+      });
+  });
+});
 
 describe("PATCH /api/comments/:comment_id", () => {
   test("PATCH - status: 200 - updates votes correctly if votes increment is positive, on the correct object", () => {

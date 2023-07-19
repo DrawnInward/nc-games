@@ -53,3 +53,32 @@ returning*;
       return response.rows[0];
     });
 };
+
+exports.updateUser = (fields, username) => {
+  const greenList = ["username", "password", "name", "avatar_url"];
+
+  const invalidFields = Object.keys(fields).filter(
+    (field) => !greenList.includes(field) || typeof fields[field] !== "string"
+  );
+
+  if (invalidFields.length > 0) {
+    return Promise.reject({ status: 400, msg: "Bad request! Invalid fields." });
+  }
+
+  const setClause = Object.keys(fields)
+    .map((field, index) => `${field} = $${index + 1}`)
+    .join(", ");
+
+  const values = Object.values(fields);
+
+  const updateUserQuery = `
+    UPDATE users
+    SET ${setClause}
+    WHERE username = $${values.length + 1}
+    RETURNING *
+  `;
+
+  return db.query(updateUserQuery, [...values, username]).then((result) => {
+    return result.rows[0];
+  });
+};
