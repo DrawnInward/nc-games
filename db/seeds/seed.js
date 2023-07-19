@@ -41,7 +41,7 @@ const seed = ({ categoryData, commentData, reviewData, userData }) => {
 				title VARCHAR NOT NULL,
 				category VARCHAR NOT NULL REFERENCES categories(slug),
 				designer VARCHAR,
-				owner VARCHAR NOT NULL REFERENCES users(username),
+				owner VARCHAR NOT NULL REFERENCES users(username) ON DELETE CASCADE,
 				review_body VARCHAR NOT NULL,
 				review_img_url VARCHAR DEFAULT 'https://images.pexels.com/photos/163064/play-stone-network-networked-interactive-163064.jpeg?w=700&h=700',
 				created_at TIMESTAMP DEFAULT NOW(),
@@ -53,8 +53,8 @@ const seed = ({ categoryData, commentData, reviewData, userData }) => {
 			CREATE TABLE comments (
 				comment_id SERIAL PRIMARY KEY,
 				body VARCHAR NOT NULL,
-				review_id INT REFERENCES reviews(review_id) NOT NULL,
-				author VARCHAR REFERENCES users(username) NOT NULL,
+				review_id INT NOT NULL REFERENCES reviews(review_id) ON DELETE CASCADE,
+        author VARCHAR NOT NULL REFERENCES users(username) ON DELETE CASCADE,
 				votes INT DEFAULT 0 NOT NULL,
 				created_at TIMESTAMP DEFAULT NOW()
 			);`);

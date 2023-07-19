@@ -622,6 +622,25 @@ describe("PATCH /api/users/:username", () => {
   });
 });
 
+describe("DELETE /api/users/:username", () => {
+  test("status 204 -- successfully deletes a given user", () => {
+    return request(app)
+      .delete("/api/users/philippaclaire9")
+      .expect(204)
+      .then(() => {
+        return request(app)
+          .get("/api/users")
+          .expect(200)
+          .then((response) => {
+            expect(response.body.users.length).toBe(3);
+            response.body.users.forEach((user) => {
+              expect(user.username).not.toBe("philippaclaire9");
+            });
+          });
+      });
+  });
+});
+
 describe("PATCH /api/comments/:comment_id", () => {
   test("PATCH - status: 200 - updates votes correctly if votes increment is positive, on the correct object", () => {
     return request(app)

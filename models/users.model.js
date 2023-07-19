@@ -82,3 +82,13 @@ exports.updateUser = (fields, username) => {
     return result.rows[0];
   });
 };
+
+exports.removeUser = (username) => {
+  const deleteUserQuery = `
+DELETE FROM users
+WHERE username = $1;
+`;
+  return checkFieldExists("users", "username", username).then(() => {
+    return db.query(deleteUserQuery, [username]);
+  });
+};

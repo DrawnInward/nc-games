@@ -3,6 +3,7 @@ const {
   selectUser,
   createUser,
   updateUser,
+  removeUser,
 } = require("../models/users.model");
 
 exports.getUsers = (req, res) => {
@@ -39,6 +40,17 @@ exports.patchUser = (req, res, next) => {
   updateUser(fields, username)
     .then((result) => {
       res.status(200).send({ updatedUser: result });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.deleteUser = (req, res, next) => {
+  const { username } = req.params;
+  removeUser(username)
+    .then(() => {
+      res.status(204).send();
     })
     .catch((err) => {
       next(err);
