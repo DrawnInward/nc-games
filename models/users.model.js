@@ -1,5 +1,5 @@
 const db = require("../db/connection");
-const { checkFieldExists } = require("../app/utils");
+const { checkFieldExists, hashPassword } = require("../app/utils");
 const bcrypt = require("bcrypt");
 
 exports.selectUsers = () => {
@@ -29,7 +29,7 @@ exports.selectUser = (user) => {
 };
 
 exports.createUser = (newUser) => {
-  const { username, password, name, avatar_url } = newUser;
+  let { username, password, name, avatar_url } = newUser;
   const newUserQuery = `
 INSERT INTO users
 (username, password, name, avatar_url)
@@ -47,6 +47,8 @@ returning*;
   ) {
     return Promise.reject({ status: 400, msg: "bad request!" });
   }
+
+  password = hashPassword(password);
 
   return db
     .query(newUserQuery, [username, password, name, avatar_url])
@@ -95,7 +97,7 @@ WHERE username = $1;
 };
 
 exports.authenticateUser = async (body) => {
-  const { username, password } = body;;
+  const { username, password } = body;
 
   const userQuery = `SELECT * FROM users 
   WHERE username = $1;`;

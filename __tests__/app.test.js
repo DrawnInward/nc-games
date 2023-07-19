@@ -503,6 +503,7 @@ describe("POST /api/users", () => {
         expect(response.body.newUser).toHaveProperty("avatar_url");
         expect(response.body.newUser).toHaveProperty("name");
         expect(response.body.newUser).toHaveProperty("password");
+        expect(response.body.newUser.password).not.toBe("Password");
       })
       .then(() => {
         return request(app)
