@@ -1,5 +1,6 @@
 const db = require("../db/connection");
 const { checkFieldExists } = require("../app/utils");
+const bcrypt = require("bcrypt");
 
 exports.selectUsers = () => {
   const userQuery = "SELECT * FROM users;";
@@ -90,5 +91,27 @@ WHERE username = $1;
 `;
   return checkFieldExists("users", "username", username).then(() => {
     return db.query(deleteUserQuery, [username]);
+  });
+};
+
+exports.authenticateUser = async (body) => {
+  const { username, password } = body;;
+
+  const userQuery = `SELECT * FROM users 
+  WHERE username = $1;`;
+
+  return checkFieldExists("users", "username", username).then(() => {
+    return db.query(userQuery, [username]).then(async (response) => {
+      const passwordMatch = await bcrypt.compare(
+        password,
+        response.rows[0].password
+      );
+
+      if (!passwordMatch) {
+        return Promise.reject({ status: 400, msg: "Password incorrect" });
+      }
+
+      return response.rows[0];
+    });
   });
 };

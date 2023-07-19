@@ -3,6 +3,7 @@ const app = require("../app/app");
 const data = require("../db/data/test-data");
 const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
+const bcrypt = require("bcrypt");
 
 beforeEach(() => seed(data));
 
@@ -738,4 +739,44 @@ describe("PATCH /api/comments/:comment_id", () => {
   });
 });
 
-
+describe("Authentication", () => {
+  test("will return user if password and hashed password match", () => {
+    return request(app)
+      .post("/api/users/authentication")
+      .expect(200)
+      .send({
+        username: "mallionaire",
+        password: "Password",
+      })
+      .then((response) => {
+        const { user } = response.body;
+        expect(user.username).toBe("mallionaire");
+      });
+  });
+  test("will return error if password and hanshed password do not match", () => {
+    return request(app)
+      .post("/api/users/authentication")
+      .expect(400)
+      .send({
+        username: "mallionaire",
+        password: "Password1!",
+      })
+      .then((response) => {
+        const { user } = response.body;
+        expect(response.body.msg).toBe("Password incorrect");
+      });
+  });
+  test("will return error if usrename does not exist", () => {
+    return request(app)
+      .post("/api/users/authentication")
+      .expect(404)
+      .send({
+        username: "coolBoy420",
+        password: "Password1!",
+      })
+      .then((response) => {
+        const { user } = response.body;
+        expect(response.body.msg).toBe("invalid field entered");
+      });
+  });
+});

@@ -4,6 +4,7 @@ const {
   createUser,
   updateUser,
   removeUser,
+  authenticateUser,
 } = require("../models/users.model");
 
 exports.getUsers = (req, res) => {
@@ -55,4 +56,14 @@ exports.deleteUser = (req, res, next) => {
     .catch((err) => {
       next(err);
     });
+};
+
+exports.validateUser = async (req, res, next) => {
+  const { body } = req;
+  try {
+    const user = await authenticateUser(body);
+    res.status(200).send({ user });
+  } catch (err) {
+    next(err);
+  }
 };

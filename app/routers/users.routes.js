@@ -5,6 +5,7 @@ const {
   postUser,
   patchUser,
   deleteUser,
+  validateUser,
 } = require("../../controllers/users.controllers");
 const usersRouter = express.Router();
 
@@ -15,5 +16,7 @@ usersRouter
   .get(getUser)
   .patch(patchUser)
   .delete(deleteUser);
+
+usersRouter.route("/:authentication").post(validateUser);
 
 module.exports = usersRouter;

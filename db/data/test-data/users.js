@@ -1,3 +1,5 @@
+const { addPasswordToUsers, hashPasswords } = require("../../../app/utils");
+
 const testUsers = [
   {
     username: "mallionaire",
@@ -23,14 +25,7 @@ const testUsers = [
   },
 ];
 
-const addPasswordToUsers = () => {
-  const updatedUsers = testUsers.map((user) => {
-    user.password = "Password";
-    return user;
-  });
-  return updatedUsers;
-};
+const usersWithPasswords = addPasswordToUsers(testUsers);
+const usersWithHashedPasswords = hashPasswords(usersWithPasswords);
 
-const usersWithPasswords = addPasswordToUsers();
-
-module.exports = usersWithPasswords;
+module.exports = usersWithHashedPasswords;
