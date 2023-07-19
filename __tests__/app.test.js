@@ -434,7 +434,7 @@ describe("DELETE /api/comments/:comment_id", () => {
         expect(response.body.msg).toBe("bad request!");
       });
   });
-  test("DELETE - status 404 - will give 400 when given a valid ID that doesn't exist", () => {
+  test("DELETE - status 404 - will give 404 when given a valid ID that doesn't exist", () => {
     return request(app)
       .delete("/api/comments/3000")
       .then((response) => {
@@ -623,7 +623,7 @@ describe("PATCH /api/users/:username", () => {
 });
 
 describe("DELETE /api/users/:username", () => {
-  test("status 204 -- successfully deletes a given user", () => {
+  test("status 204 -- successfully deletes a given user, along with reviews and comments they have authored", () => {
     return request(app)
       .delete("/api/users/philippaclaire9")
       .expect(204)
@@ -637,6 +637,36 @@ describe("DELETE /api/users/:username", () => {
               expect(user.username).not.toBe("philippaclaire9");
             });
           });
+      })
+      .then(() => {
+        return request(app)
+          .get("/api/reviews")
+          .expect(200)
+          .then((response) => {
+            expect(response.body.reviews.length).toBe(12);
+            response.body.reviews.forEach((user) => {
+              expect(user.author).not.toBe("philippaclaire9");
+            });
+          });
+      })
+      .then(() => {
+        return request(app)
+          .get("/api/reviews/3/comments")
+          .expect(200)
+          .then((response) => {
+            expect(response.body.comments.length).toBe(1);
+            response.body.comments.forEach((user) => {
+              expect(user.author).not.toBe("philippaclaire9");
+            });
+          });
+      });
+  });
+  test("status 404 -- correctly handles error if username does not exist", () => {
+    return request(app)
+      .delete("/api/users/philippaclaire")
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe("invalid field entered");
       });
   });
 });
@@ -707,3 +737,5 @@ describe("PATCH /api/comments/:comment_id", () => {
       });
   });
 });
+
+
