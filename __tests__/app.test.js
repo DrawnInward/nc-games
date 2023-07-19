@@ -486,7 +486,7 @@ describe("GET /api/users", () => {
 });
 
 describe("POST /api/users", () => {
-  test("should post new user", () => {
+  test("status 201 -- should post new user", () => {
     return request(app)
       .post("/api/users")
       .expect(201)
@@ -516,7 +516,7 @@ describe("POST /api/users", () => {
           });
       });
   });
-  test("should handle error when fields are missing", () => {
+  test("status 400 -- should handle error when fields are missing", () => {
     return request(app)
       .post("/api/users")
       .expect(400)
@@ -530,7 +530,42 @@ describe("POST /api/users", () => {
         expect(response.body.msg).toBe("bad request!");
       });
   });
+  test("status 400 -- should handle error when additional fiedls are sent", () => {
+    return request(app)
+      .post("/api/users")
+      .expect(400)
+      .send({
+        username: "Bacchus",
+        password: "Password",
+        name: "Theodor",
+        avatar_url:
+          "https://images.unsplash.com/photo-1575936123452-b67c3203c357?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aW1hZ2V8ZW58MHx8MHx8fDA%3D&w=1000&q=80",
+        additionalField: "injection",
+      })
+      .then((response) => {
+        expect(response.body.msg).toBe("bad request!");
+      });
+  });
+  test("status 400 -- should handle error if values are not strings", () => {
+    return request(app)
+      .post("/api/users")
+      .expect(400)
+      .send({
+        username: "Bacchus",
+        password: true,
+        name: "Theodor",
+        avatar_url:
+          "https://images.unsplash.com/photo-1575936123452-b67c3203c357?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aW1hZ2V8ZW58MHx8MHx8fDA%3D&w=1000&q=80",
+      })
+      .then((response) => {
+        expect(response.body.msg).toBe("bad request!");
+      });
+  });
 });
+
+/* describe("PATCH /api/users/:username", () => {
+  test("");
+}); */
 
 describe("PATCH /api/comments/:comment_id", () => {
   test("PATCH - status: 200 - updates votes correctly if votes increment is positive, on the correct object", () => {
