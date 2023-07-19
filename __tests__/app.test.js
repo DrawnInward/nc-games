@@ -453,7 +453,7 @@ describe("GET /api/users", () => {
       .expect(200)
       .then((response) => {
         expect(response.body.users.length).toBe(4);
-        expect(Object.keys(response.body.users[0]).length).toBe(3);
+        expect(Object.keys(response.body.users[0]).length).toBe(4);
         response.body.users.forEach((user) => {
           expect(user).toHaveProperty("username");
           expect(user).toHaveProperty("name");
@@ -468,7 +468,7 @@ describe("GET /api/users", () => {
         .get("/api/users/philippaclaire9")
         .expect(200)
         .then((response) => {
-          expect(Object.keys(response.body.user).length).toBe(3);
+          expect(Object.keys(response.body.user).length).toBe(4);
           expect(response.body.user).toHaveProperty("username");
           expect(response.body.user).toHaveProperty("avatar_url");
           expect(response.body.user).toHaveProperty("name");
@@ -482,6 +482,53 @@ describe("GET /api/users", () => {
           expect(response.body.msg).toBe("invalid field entered");
         });
     });
+  });
+});
+
+describe("POST /api/users", () => {
+  test("should post new user", () => {
+    return request(app)
+      .post("/api/users")
+      .expect(201)
+      .send({
+        username: "Bacchus",
+        password: "Password",
+        name: "Theodor",
+        avatar_url:
+          "https://images.unsplash.com/photo-1575936123452-b67c3203c357?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aW1hZ2V8ZW58MHx8MHx8fDA%3D&w=1000&q=80",
+      })
+      .then((response) => {
+        expect(response.body.newUser).toHaveProperty("username");
+        expect(response.body.newUser).toHaveProperty("avatar_url");
+        expect(response.body.newUser).toHaveProperty("name");
+        expect(response.body.newUser).toHaveProperty("password");
+      })
+      .then(() => {
+        return request(app)
+          .get("/api/users/Bacchus")
+          .expect(200)
+          .then((response) => {
+            expect(Object.keys(response.body.user).length).toBe(4);
+            expect(response.body.user).toHaveProperty("username");
+            expect(response.body.user).toHaveProperty("avatar_url");
+            expect(response.body.user).toHaveProperty("name");
+            expect(response.body.user).toHaveProperty("password");
+          });
+      });
+  });
+  test("should handle error when fields are missing", () => {
+    return request(app)
+      .post("/api/users")
+      .expect(400)
+      .send({
+        username: "Bacchus",
+        name: "Theodor",
+        avatar_url:
+          "https://images.unsplash.com/photo-1575936123452-b67c3203c357?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aW1hZ2V8ZW58MHx8MHx8fDA%3D&w=1000&q=80",
+      })
+      .then((response) => {
+        expect(response.body.msg).toBe("bad request!");
+      });
   });
 });
 
