@@ -17,6 +17,6 @@ usersRouter
   .patch(patchUser)
   .delete(deleteUser);
 
-usersRouter.route("/:authentication").post(validateUser);
+usersRouter.route("/authentication").post(validateUser);
 
 module.exports = usersRouter;

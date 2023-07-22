@@ -21,22 +21,30 @@ exports.selectUser = (user) => {
   const userQuery = `SELECT * FROM users 
   WHERE username = $1;`;
 
-  return checkFieldExists("users", "username", user).then(() => {
-    return db.query(userQuery, [user]).then((response) => {
-      return response.rows[0];
+  return checkFieldExists("users", "username", user)
+    .then(() => {
+      return db.query(userQuery, [user]).then((response) => {
+        return response.rows[0];
+      });
+    })
+    .catch((err) => {
+      return Promise.reject({
+        status: 500,
+        msg: "Failed to select user",
+        error: err,
+      });
     });
-  });
 };
 
 exports.createUser = (newUser) => {
   let { username, password, name, avatar_url } = newUser;
   const newUserQuery = `
-INSERT INTO users
-(username, password, name, avatar_url)
-VALUES
-($1, $2, $3, $4)
-returning*;
-`;
+    INSERT INTO users
+    (username, password, name, avatar_url)
+    VALUES
+    ($1, $2, $3, $4)
+    RETURNING *;
+  `;
 
   if (
     Object.keys(newUser).length !== 4 ||
@@ -45,7 +53,7 @@ returning*;
     typeof name !== "string" ||
     typeof avatar_url !== "string"
   ) {
-    return Promise.reject({ status: 400, msg: "bad request!" });
+    return Promise.reject({ status: 400, msg: "Bad request!" });
   }
 
   password = hashPassword(password);
@@ -54,6 +62,13 @@ returning*;
     .query(newUserQuery, [username, password, name, avatar_url])
     .then((response) => {
       return response.rows[0];
+    })
+    .catch((err) => {
+      return Promise.reject({
+        status: 500,
+        msg: "Failed to create user",
+        error: err,
+      });
     });
 };
 
@@ -81,19 +96,37 @@ exports.updateUser = (fields, username) => {
     RETURNING *
   `;
 
-  return db.query(updateUserQuery, [...values, username]).then((result) => {
-    return result.rows[0];
-  });
+  return db
+    .query(updateUserQuery, [...values, username])
+    .then((result) => {
+      return result.rows[0];
+    })
+    .catch((err) => {
+      return Promise.reject({
+        status: 500,
+        msg: "Failed to update user",
+        error: err,
+      });
+    });
 };
 
 exports.removeUser = (username) => {
   const deleteUserQuery = `
-DELETE FROM users
-WHERE username = $1;
-`;
-  return checkFieldExists("users", "username", username).then(() => {
-    return db.query(deleteUserQuery, [username]);
-  });
+    DELETE FROM users
+    WHERE username = $1;
+  `;
+
+  return checkFieldExists("users", "username", username)
+    .then(() => {
+      return db.query(deleteUserQuery, [username]);
+    })
+    .catch((err) => {
+      return Promise.reject({
+        status: 500,
+        msg: "Failed to delete user",
+        error: err,
+      });
+    });
 };
 
 exports.authenticateUser = async (body) => {
@@ -102,18 +135,25 @@ exports.authenticateUser = async (body) => {
   const userQuery = `SELECT * FROM users 
   WHERE username = $1;`;
 
-  return checkFieldExists("users", "username", username).then(() => {
-    return db.query(userQuery, [username]).then(async (response) => {
-      const passwordMatch = await bcrypt.compare(
-        password,
-        response.rows[0].password
-      );
+  try {
+    await checkFieldExists("users", "username", username);
 
-      if (!passwordMatch) {
-        return Promise.reject({ status: 400, msg: "Password incorrect" });
-      }
+    const response = await db.query(userQuery, [username]);
+    const passwordMatch = await bcrypt.compare(
+      password,
+      response.rows[0].password
+    );
 
-      return response.rows[0];
+    if (!passwordMatch) {
+      return Promise.reject({ status: 400, msg: "Password incorrect" });
+    }
+
+    return response.rows[0];
+  } catch (err) {
+    return Promise.reject({
+      status: 500,
+      msg: "Failed to authenticate user",
+      error: err,
     });
-  });
+  }
 };
