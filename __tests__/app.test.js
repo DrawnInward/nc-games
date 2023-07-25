@@ -823,24 +823,19 @@ describe("Votes table", () => {
       });
   });
 
-  /* test("PATCH -- status 200 -- should update the table with relevant vote data", () => {
+  test("PATCH -- status 200 -- should update the vote direction", () => {
     return request(app)
       .patch("/api/votes")
       .expect(200)
       .send({
         username: "mallionaire",
         comment_id: 4,
-        review_id: 2,
         vote_direction: -1,
       })
       .then((response) => {
-        expect(response.body.votes.length).toBe(3);
-        expect(response.body.votes[3].comment_id).toBe(4);
-        expect(response.body.votes[3].comment_id).toBe(2);
-        expect(response.body.votes[3].vote_direction).toBe(1);
-        response.body.votes.forEach((user) => {
-          expect(user.username).toBe("mallionaire");
-        });
+        expect(response.body.updatedVote.comment_id).toBe(4);
+        expect(response.body.updatedVote.username).toBe("mallionaire");
+        expect(response.body.updatedVote.vote_direction).toBe(-1);
       });
-  }); */
+  });
 });

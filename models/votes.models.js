@@ -39,3 +39,28 @@ exports.createVote = (newVote) => {
       return response.rows[0];
     });
 };
+
+exports.updateVotes = (vote) => {
+  const columnName = vote.comment_id ? "comment_id" : "review_id";
+
+  const changeVotesQuery = `
+    UPDATE votes
+    SET vote_direction = $1
+    WHERE ${columnName} = $2
+    returning*
+    `;
+
+  if (Object.keys(vote).length !== 3 || typeof vote[columnName] !== "number") {
+    return Promise.reject({ status: 400, msg: "bad request!" });
+  }
+
+  console.log(vote[columnName], "vlaue");
+
+  return checkFieldExists("votes", columnName, vote[columnName]).then(() => {
+    return db
+      .query(changeVotesQuery, [vote.vote_direction, vote[columnName]])
+      .then((result) => {
+        return result.rows[0];
+      });
+  });
+};

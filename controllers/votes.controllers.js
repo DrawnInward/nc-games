@@ -1,4 +1,8 @@
-const { selectVotes, createVote } = require("../models/votes.models");
+const {
+  selectVotes,
+  createVote,
+  updateVotes,
+} = require("../models/votes.models");
 
 exports.getVotes = (req, res, next) => {
   const { username } = req.params;
@@ -16,6 +20,17 @@ exports.postVote = (req, res, next) => {
   createVote(newVote)
     .then((response) => {
       res.status(201).send({ newVote: response });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.patchVote = (req, res, next) => {
+  const vote = req.body;
+  updateVotes(vote)
+    .then((result) => {
+      res.status(200).send({ updatedVote: result });
     })
     .catch((err) => {
       next(err);
