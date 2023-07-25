@@ -54,8 +54,6 @@ exports.updateVotes = (vote) => {
     return Promise.reject({ status: 400, msg: "bad request!" });
   }
 
-  console.log(vote[columnName], "vlaue");
-
   return checkFieldExists("votes", columnName, vote[columnName]).then(() => {
     return db
       .query(changeVotesQuery, [vote.vote_direction, vote[columnName]])
