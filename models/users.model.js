@@ -37,7 +37,8 @@ exports.selectUser = (user) => {
 };
 
 exports.createUser = (newUser) => {
-  let { username, password, name, avatar_url } = newUser;
+  const { username, name, avatar_url } = newUser;
+  let { password } = newUser;
   const newUserQuery = `
     INSERT INTO users
     (username, password, name, avatar_url)

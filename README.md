@@ -95,3 +95,14 @@ DELETE /api/comments/:comment_id
     Description: Deletes a comment by the comment ID from the database.
 
     Queries: None
+
+      /* .then(() => {
+        return db.query(`
+      CREATE TABLE votes (
+        vote_id SERIAL PRIMARY KEY,
+        username VARCHAR NOT NULL REFERENCES users(username),
+        comment_id INT REFERENCES comments(comment_id), 
+        review_id INT REFERENCES reviews(review_id),
+        vote_direction INT 
+      );`);
+      }) */

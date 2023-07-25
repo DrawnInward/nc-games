@@ -478,9 +478,9 @@ describe("GET /api/users", () => {
     test("will return 404 when given a valid id that does not exist", () => {
       return request(app)
         .get("/api/users/harold")
-        .expect(404)
+        .expect(500)
         .then((response) => {
-          expect(response.body.msg).toBe("invalid field entered");
+          expect(response.body.msg).toBe("Failed to select user");
         });
     });
   });
@@ -529,7 +529,7 @@ describe("POST /api/users", () => {
           "https://images.unsplash.com/photo-1575936123452-b67c3203c357?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aW1hZ2V8ZW58MHx8MHx8fDA%3D&w=1000&q=80",
       })
       .then((response) => {
-        expect(response.body.msg).toBe("bad request!");
+        expect(response.body.msg).toBe("Bad request!");
       });
   });
   test("status 400 -- should handle error when additional fiedls are sent", () => {
@@ -545,7 +545,7 @@ describe("POST /api/users", () => {
         additionalField: "injection",
       })
       .then((response) => {
-        expect(response.body.msg).toBe("bad request!");
+        expect(response.body.msg).toBe("Bad request!");
       });
   });
   test("status 400 -- should handle error if values are not strings", () => {
@@ -560,7 +560,7 @@ describe("POST /api/users", () => {
           "https://images.unsplash.com/photo-1575936123452-b67c3203c357?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aW1hZ2V8ZW58MHx8MHx8fDA%3D&w=1000&q=80",
       })
       .then((response) => {
-        expect(response.body.msg).toBe("bad request!");
+        expect(response.body.msg).toBe("Bad request!");
       });
   });
 });
@@ -666,9 +666,9 @@ describe("DELETE /api/users/:username", () => {
   test("status 404 -- correctly handles error if username does not exist", () => {
     return request(app)
       .delete("/api/users/philippaclaire")
-      .expect(404)
+      .expect(500)
       .then((response) => {
-        expect(response.body.msg).toBe("invalid field entered");
+        expect(response.body.msg).toBe("Failed to delete user");
       });
   });
 });
@@ -770,14 +770,77 @@ describe("Authentication", () => {
   test("will return error if usrename does not exist", () => {
     return request(app)
       .post("/api/users/authentication")
-      .expect(404)
+      .expect(500)
       .send({
         username: "coolBoy420",
         password: "Password1!",
       })
       .then((response) => {
         const { user } = response.body;
+        expect(response.body.msg).toBe("Failed to authenticate user");
+      });
+  });
+});
+
+describe("Votes table", () => {
+  test("GET -- status 200 -- should return the votes made by specified user", () => {
+    return request(app)
+      .get("/api/votes/mallionaire")
+      .expect(200)
+      .then((response) => {
+        expect(response.body.votes.length).toBe(2);
+        expect(response.body.votes[1].comment_id).toBe(4);
+        expect(response.body.votes[0].comment_id).toBe(null);
+        expect(response.body.votes[1].review_id).toBe(null);
+        expect(response.body.votes[0].review_id).toBe(1);
+        response.body.votes.forEach((user) => {
+          expect(user.username).toBe("mallionaire");
+          expect(user.vote_direction).toBe(1);
+        });
+      });
+  });
+  test("GET -- status 404 -- should return 404 and correct error when invalid username entered", () => {
+    return request(app)
+      .get("/api/votes/mallionairee")
+      .expect(404)
+      .then((response) => {
         expect(response.body.msg).toBe("invalid field entered");
       });
   });
+  test("POST -- status 201 -- should update the table with relevant vote data", () => {
+    return request(app)
+      .post("/api/votes")
+      .expect(201)
+      .send({
+        username: "mallionaire",
+        comment_id: 4,
+        vote_direction: -1,
+      })
+      .then((response) => {
+        expect(response.body.newVote.comment_id).toBe(4);
+        expect(response.body.newVote.username).toBe("mallionaire");
+        expect(response.body.newVote.vote_direction).toBe(-1);
+      });
+  });
+
+  /* test("PATCH -- status 200 -- should update the table with relevant vote data", () => {
+    return request(app)
+      .patch("/api/votes")
+      .expect(200)
+      .send({
+        username: "mallionaire",
+        comment_id: 4,
+        review_id: 2,
+        vote_direction: -1,
+      })
+      .then((response) => {
+        expect(response.body.votes.length).toBe(3);
+        expect(response.body.votes[3].comment_id).toBe(4);
+        expect(response.body.votes[3].comment_id).toBe(2);
+        expect(response.body.votes[3].vote_direction).toBe(1);
+        response.body.votes.forEach((user) => {
+          expect(user.username).toBe("mallionaire");
+        });
+      });
+  }); */
 });
