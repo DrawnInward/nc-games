@@ -42,11 +42,12 @@ exports.createVote = (newVote) => {
 
 exports.updateVotes = (vote) => {
   const columnName = vote.comment_id ? "comment_id" : "review_id";
+  const { username, vote_direction } = vote;
 
   const changeVotesQuery = `
     UPDATE votes
     SET vote_direction = $1
-    WHERE ${columnName} = $2
+    WHERE ${columnName} = $2 AND username = $3
     returning*
     `;
 
@@ -56,7 +57,7 @@ exports.updateVotes = (vote) => {
 
   return checkFieldExists("votes", columnName, vote[columnName]).then(() => {
     return db
-      .query(changeVotesQuery, [vote.vote_direction, vote[columnName]])
+      .query(changeVotesQuery, [vote_direction, vote[columnName], username])
       .then((result) => {
         return result.rows[0];
       });
