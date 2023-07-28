@@ -46,7 +46,7 @@ exports.updateVotes = (vote) => {
 
   const changeVotesQuery = `
     UPDATE votes
-    SET vote_direction = $1
+    SET vote_direction = vote_direction + $1
     WHERE ${columnName} = $2 AND username = $3
     returning*
     `;
